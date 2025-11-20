@@ -1,6 +1,6 @@
 # Taming Generative Synthetic Data for X-ray Prohibited Item Detection
 
-[[Paper](https://arxiv.org/abs/2511.15299)]
+[[Arxiv](https://arxiv.org/abs/2511.15299)] [[HF](https://huggingface.co/papers/2511.15299)]
 
 <figure style="display:block; text-align:center; margin:0 auto;">
   <img src="figures/analysis.jpg"
