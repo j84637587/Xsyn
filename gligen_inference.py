@@ -1573,10 +1573,7 @@ if __name__ == "__main__":
     parser.add_argument('--vis_path', default = '/home/ct/data/sjl/gligen_official_inpaint_opiray/generated_images/text_box_180000/gen3_ablation/visualization/')
     parser.add_argument('--ca_vis_path', default = '/home/ct/data/sjl/gligen_official_inpaint_opiray/generated_images/text_box_180000/gen3_ablation/visualization_ca_mp_16/')
     '''
-    # parser.add_argument('--output_path', default = '/home/ct/data/sjl/gligen_official_hixray/generated_images/text_box_180000/gen1/data/') #
-    # parser.add_argument('--annotation_path', default = '/home/ct/data/sjl/gligen_official_hixray/generated_images/text_box_180000/gen1/annotation/')
-    # parser.add_argument('--vis_path', default = '/home/ct/data/sjl/gligen_official_hixray/generated_images/text_box_180000/gen1/visualization/')
-    # parser.add_argument('--ca_vis_path', default = '/home/ct/data/sjl/gligen_official_hixray/generated_images/text_box_180000/gen1/visualization_ca_mp_16/')
+
     '''
     parser.add_argument('--output_path', default = '/home/ct/data/sjl/gligen_official_opixray/generated_images/text_box_180000/gligen/data/') #
     parser.add_argument('--annotation_path', default = '/home/ct/data/sjl/gligen_official_opixray/generated_images/text_box_180000/gligen/annotation/')
@@ -1589,20 +1586,14 @@ if __name__ == "__main__":
     parser.add_argument('--annotation_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/annotation/')
     parser.add_argument('--vis_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/visualization/')
     parser.add_argument('--ca_vis_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/visualization_ca_mp_16/')
-    
-    parser.add_argument('--correspondence_path', default = '/home/ct/data/sjl/gligen_official_inpaint/generated_images/pidray/low_resolution/text_box_180000/gen2/correspondence/')
+
     #parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/OPIXray/train/train_image')
     #parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/HiXray/train/train_image')
     parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/PIDray/pidray_prohibited/train_imgs')
-    parser.add_argument('--depth_path', default = '/home/ct/data/sjl/diffusion/pidray_low_resolution/depth/train')
     parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official/text_box/tag01/checkpoint_00180001.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_inpaint/text_box_180000/tag01/checkpoint_00050000.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_hixray_inpaint/text_box/tag00/checkpoint_00050000.pth')
-    #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_hixray/text_box/tag00/checkpoint_00180000.pth')
-    #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_opiray/text_box/tag00/checkpoint_00180000.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_opixray_inpaint_ckpt/checkpoint_00050000.pth')
-    parser.add_argument('--ref_path', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/only_prohibited/xray/train/')
-    parser.add_argument("--seg_mask_path", type=str, default='/home/ct/data/sjl/diffusion/pidray_low_resolution/seg/train')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_gligen_seg_image_project.pt')
     parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_mask.pt')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_full.pt')
@@ -1617,16 +1608,14 @@ if __name__ == "__main__":
     parser.add_argument('--sam_box_iou_thre', default = 0.2)
     parser.add_argument('--use_sam', default = True)
     parser.add_argument('--category_group_area_boudary', default = [10000, 25000]) # pidray
-    #parser.add_argument('--hard_categories', default = ['Gun', 'Knife', 'Sprayer', 'Bullet', 'Lighter']) # pidray
     #parser.add_argument('--category_group_area_boudary', default = [10000, 15000]) # opiray
     #parser.add_argument('--category_group_area_boudary', default = [40000, 100000]) # hixray
-    #parser.add_argument('--hard_categories', default = ['Portable_Charger_1', 'Portable_Charger_2', 'Water', 'Cosmetic', 'Nonmetallic_Lighter']) # hixray
 
-    # 生成方式
+    # Generation method(set to 1 for Xsyn-M and 3 for Xsyn-A)
     parser.add_argument('--gen_method', default=1, help='')
 
-    # quality enhancement
-    parser.add_argument('--latent_redist', default=False, help='whether or not redistribute latents according to alpha')
+    # BOM
+    parser.add_argument('--latent_redist', default=True, help='whether or not redistribute latents according to alpha')
     parser.add_argument('--alpha', default=[0.3], help='indicate the hidden propotion')
     parser.add_argument('--hidden_start_step', default=1, help='indicate which timestep to do latent redist')
     parser.add_argument('--hidden_time', default='after', help='chosen from [after | during]')
@@ -1639,14 +1628,11 @@ if __name__ == "__main__":
     parser.add_argument('--gen3_hidden_anno', default='/home/ct/data/sjl/gligen_official_inpaint_opiray/generated_images/text_box_100000/gen3_0.4%_filter_best/annotation/anno_refine.json') #opixray
     #parser.add_argument('--gen3_hidden_anno', default='/home/ct/data/sjl/gligen_official_hixray_inpaint/generated_images/text_box_180000/gen3_0.5%_filter_best/annotation/anno_refine.json')
     
-
-    # annotation refinement
-    parser.add_argument('--refine_anno', default=True, help='whether or not use scar')
-    parser.add_argument('--scar', default=False, help='whether or not use scar')
-    parser.add_argument('--attend_and_excite', default=True, help='whether or not use attend')
-    parser.add_argument('--scratch_generate', default=True, help='whether or not use sam_cross_attention_map to refine annotation')
+    # CAR
+    parser.add_argument('--refine_anno', default=True, help='whether or not use car')
+    parser.add_argument('--scratch_generate', default=True)
     parser.add_argument('--do_decode', default=True, help='whether or not decode the image')
-    parser.add_argument('--refine_strategies', default='h_sampling', help='scar strategies, chosen from [h_sampling | topk_sampling]')
+    parser.add_argument('--refine_strategies', default='h_sampling', help='car strategies, chosen from [h_sampling | topk_sampling]')
     parser.add_argument('--h_sampling_strategies', default='median', help='h_sampling strategies, chosen from [mode_convex | median_convex | median | median_topk], meaningful only when refine_strategies is h_sampling')
     parser.add_argument('--range_nums', default=[1,2,3,4], help='indicates the range of anchor points in ca_map')
     parser.add_argument('--topks', default=[1], help='topk sample points in ca_map')
@@ -1659,7 +1645,7 @@ if __name__ == "__main__":
     parser.add_argument('--kernel_size', default=3, help='Gaussian kernel_size')
     parser.add_argument('--normalize_eot', default=False, help='')
 
-    parser.add_argument('--inpaint', default=False, help='')
+    parser.add_argument('--inpaint', default=True, help='')
 
     args = parser.parse_args()
     
