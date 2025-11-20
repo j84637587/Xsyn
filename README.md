@@ -50,3 +50,6 @@ Details of some important args:
 - `--latent_redist`: set to True for `BOM`
 
 After inference, we use `downstream_test.sh` to test the performance of our sythetic data. Our downstream detection environment is [mmdetection](https://github.com/open-mmlab/mmdetection).
+
+## 🙏 Acknowledgment
+This work is implemented based on [GLIGEN](https://github.com/gligen/GLIGEN). We greatly appreciate their valuable contributions to the community.
