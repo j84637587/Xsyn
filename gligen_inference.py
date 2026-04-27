@@ -445,6 +445,8 @@ def run(config):
         dataset = Caption(args)
     else:
         dataset = Caption_coco(args)
+    if getattr(args, 'num_samples', None) is not None:
+        dataset.data = dataset.data[:args.num_samples]
     print(f'len(dataset) = {len(dataset)}')
     if getattr(args, 'distributed', False):
         sampler = torch.utils.data.distributed.DistributedSampler(dataset)
@@ -1027,7 +1029,7 @@ def run(config):
           shape = (config.batch_size, model.in_channels, model.image_size, model.image_size)
           #shape = (config.batch_size, model.in_channels, image_size // 8, image_size // 8)
 
-          controller = AttentionStore()
+          controller = AttentionStore(save_global_store=True)
 
           #token_indices, input_boxes = get_indices_boxes_to_alter(tokenizer, caption, vis_boxes)
           #args.token_indices = token_indices
@@ -1101,7 +1103,7 @@ def run(config):
             samples_fake = sampler.sample(S=steps, shape=shape, input=input,  uc=uc, guidance_scale=config.guidance_scale, mask=inpainting_mask, x0=z0, controller=controller, args=args, boxes=batch['boxes'], do_hidden=do_hidden, hidden_info=hidden_info, inpaint=args.inpaint)
           
           cross_attention_maps = None
-          if args.refine_anno:
+          if args.refine_anno or args.ca_vis_path:
               cross_attention_maps = show_cross_attention(controller, from_where=('up', 'down'), select=0, prompts=[caption], tokenizer=tokenizer)
 
           #print('ca_yes')
@@ -1269,6 +1271,14 @@ def run(config):
               for coord in bbox:
                   f.write('\t' + str(coord))
           f.write('\n')
+
+          if args.ca_vis_path and cross_attention_maps is not None:
+              os.makedirs(args.ca_vis_path, exist_ok=True)
+              vis_categories = categories if args.gen_method != 3 else [category]
+              for ca_map, cat in zip(cross_attention_maps, vis_categories):
+                  ca_save = os.path.join(args.ca_vis_path, filename.split('.')[0] + '_' + cat + '.png')
+                  save_visualization([sample, Image.fromarray(ca_map)], ca_save, None)
+
           print(f'I am here')
 
         
@@ -1611,6 +1621,7 @@ if __name__ == "__main__":
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/opiray/gligen/opiray_train.pt')
     parser.add_argument("--no_plms", action='store_true', help="use DDIM instead. WARNING: I did not test the code yet")
     parser.add_argument("--batch_size",  default=1, help="")
+    parser.add_argument("--num_samples", type=int, default=None, help="limit number of samples to process")
     parser.add_argument("--guidance_scale", type=float,  default=7.5, help="")
     parser.add_argument("--negative_prompt", type=str,  default='longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality', help="")
     parser.add_argument('--sam_weight', default = 'sam_vit_h_4b8939.pth')

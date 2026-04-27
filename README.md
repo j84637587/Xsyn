@@ -14,13 +14,19 @@ We propose **Xsyn**, a simple and effective one-stage synthesis pipeline for X-r
 
 ## Table of Contents
 
-- [Requirements](#requirements)
-- [Data Preparation](#data-preparation)
-- [Download Checkpoints](#download-checkpoints)
-- [Inference](#inference)
-- [Output Structure](#output-structure)
-- [Training](#training)
-- [Acknowledgment](#acknowledgment)
+- [Taming Generative Synthetic Data for X-ray Prohibited Item Detection](#taming-generative-synthetic-data-for-x-ray-prohibited-item-detection)
+  - [Table of Contents](#table-of-contents)
+  - [Requirements](#requirements)
+    - [Environment](#environment)
+  - [Data Preparation](#data-preparation)
+  - [Download Checkpoints](#download-checkpoints)
+  - [Inference](#inference)
+    - [Basic (no SAM)](#basic-no-sam)
+    - [With SAM + CAR annotation refinement](#with-sam--car-annotation-refinement)
+    - [Key arguments](#key-arguments)
+  - [Output Structure](#output-structure)
+  - [Training](#training)
+  - [Acknowledgment](#acknowledgment)
 
 ---
 
@@ -88,8 +94,8 @@ python prepare_pidray.py --ann_file data/pidray/annotations/test_hidden.json  --
 
 All models are based on [GLIGEN](https://github.com/gligen/GLIGEN).
 
-| Dataset | Mode                     | Download |
-|---------|--------------------------|----------|
+| Dataset | Mode                     | Download                                       |
+| ------- | ------------------------ | ---------------------------------------------- |
 | PIDray  | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
 | OPIXray | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
 | HiXray  | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
@@ -105,6 +111,16 @@ Place checkpoint files under `checkpoints/`.
 ## Inference
 
 ### Basic (no SAM)
+
+|生成的圖完全一樣，差別只在 annotation txt 裡的 bbox 準不準。
+|如果只是要看生成效果，Basic 就夠了。如果要拿去訓練偵測模型、需要精準 bbox，才需要 SAM + CAR。
+
+| | Basic |	With SAM + CAR |
+| 生成圖 | 一樣 | 一樣 |
+| bbox 來源 | 直接用原始標註縮放 | 用 CA map + SAM 精修過的 bbox |
+| 需要 SAM checkpoint | 不需要 | 需要 sam_vit_h_4b8939.pth |
+| 速度 | 快 | 慢（每張多跑 SAM） |
+| 標註品質 | 可能偏移 | 更貼近實際合成位置 |
 
 ```bash
 python gligen_inference.py \
@@ -137,20 +153,20 @@ python gligen_inference.py \
 
 ### Key arguments
 
-| Argument | Description |
-|----------|-------------|
-| `--ckpt_path` | Path to the Xsyn model checkpoint |
-| `--gligen_caption_pt` | Preprocessed `.pt` datafile (from `prepare_pidray.py`) |
-| `--image_path` | Directory of source images to inpaint |
-| `--output_path` | Directory to save generated images |
-| `--annotation_path` | Directory to save bounding box annotations (TXT) |
-| `--vis_path` | Directory to save GT-comparison visualizations |
-| `--ca_vis_path` | Directory to save cross-attention map visualizations |
-| `--gen_method` | `1` = Xsyn-M (fixed position), `3` = Xsyn-A (reference-based) |
-| `--refine_anno` | `True` to enable **CAR** (Cross-Attention Refinement) |
-| `--latent_redist` | `True` to enable **BOM** (Background Occlusion Modeling) |
-| `--use_sam` | `True` to use SAM for mask generation (required by BOM) |
-| `--sam_weight` | Path to SAM checkpoint (`sam_vit_h_4b8939.pth`) |
+| Argument              | Description                                                   |
+| --------------------- | ------------------------------------------------------------- |
+| `--ckpt_path`         | Path to the Xsyn model checkpoint                             |
+| `--gligen_caption_pt` | Preprocessed `.pt` datafile (from `prepare_pidray.py`)        |
+| `--image_path`        | Directory of source images to inpaint                         |
+| `--output_path`       | Directory to save generated images                            |
+| `--annotation_path`   | Directory to save bounding box annotations (TXT)              |
+| `--vis_path`          | Directory to save GT-comparison visualizations                |
+| `--ca_vis_path`       | Directory to save cross-attention map visualizations          |
+| `--gen_method`        | `1` = Xsyn-M (fixed position), `3` = Xsyn-A (reference-based) |
+| `--refine_anno`       | `True` to enable **CAR** (Cross-Attention Refinement)         |
+| `--latent_redist`     | `True` to enable **BOM** (Background Occlusion Modeling)      |
+| `--use_sam`           | `True` to use SAM for mask generation (required by BOM)       |
+| `--sam_weight`        | Path to SAM checkpoint (`sam_vit_h_4b8939.pth`)               |
 
 ---
 
