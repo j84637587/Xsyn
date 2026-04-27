@@ -29,6 +29,10 @@ python prepare_pidray.py --ann_file DATA/pidray/annotations/test_hidden.json --o
 ```
 
 ```
+conda env create -f environment.yml
+```
+
+```
 conda create -n xsyn python=3.10 -c conda-forge -y
 conda activate xsyn
 pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121

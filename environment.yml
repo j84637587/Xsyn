@@ -1,17 +1,5 @@
 name: ldm
 channels:
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
-  - http://mirrors.aliyun.com/anaconda/pkgs/free/
-  - http://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
-  - http://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
-  - http://mirrors.ustc.edu.cn/anaconda/cloud/msys2/
-  - http://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
-  - http://mirrors.ustc.edu.cn/anaconda/pkgs/free/
-  - http://mirrors.ustc.edu.cn/anaconda/pkgs/main/
   - nvidia
   - defaults
 dependencies:
