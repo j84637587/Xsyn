@@ -1594,20 +1594,18 @@ if __name__ == "__main__":
     '''
     # pidray
     
-    parser.add_argument('--output_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/data/') #
-    parser.add_argument('--annotation_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/annotation/')
-    parser.add_argument('--vis_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/visualization/')
-    parser.add_argument('--ca_vis_path', default = '/home/ct/data/sjl/gligen_official/generated_images/text_box_180000/gligen_gen1/visualization_ca_mp_16/')
+    parser.add_argument('--output_path', default='output/images/')
+    parser.add_argument('--annotation_path', default='output/annotations/')
+    parser.add_argument('--vis_path', default='output/visualization/')
+    parser.add_argument('--ca_vis_path', default='output/visualization_ca/')
 
-    #parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/OPIXray/train/train_image')
-    #parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/HiXray/train/train_image')
-    parser.add_argument('--image_path', default = '/home/ct/data/lwz/dataset/PIDray/pidray_prohibited/train_imgs')
-    parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official/text_box/tag01/checkpoint_00180001.pth')
+    parser.add_argument('--image_path', default='data/pidray/train')
+    parser.add_argument('--ckpt_path', default='checkpoints/pidray_xsyn.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_inpaint/text_box_180000/tag01/checkpoint_00050000.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_hixray_inpaint/text_box/tag00/checkpoint_00050000.pth')
     #parser.add_argument('--ckpt_path', default='/home/ct/data/sjl/gligen_official_opixray_inpaint_ckpt/checkpoint_00050000.pth')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_gligen_seg_image_project.pt')
-    parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_mask.pt')
+    parser.add_argument('--gligen_caption_pt', default='data/pidray/pidray_train.pt')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/pidray_low_resolution/gligen/pidray_train_full.pt')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/hixray/gligen/hixray_train.pt')
     #parser.add_argument('--gligen_caption_pt', default='/home/ct/data/sjl/diffusion/opiray/gligen/opiray_train.pt')
@@ -1635,10 +1633,10 @@ if __name__ == "__main__":
     parser.add_argument('--occlusion_method', default=3, help='1: self-occlusion; 2: inter-occlusion; 3: background-occlusion')
     parser.add_argument('--rand_fg_mask_hidden', default=False)
     parser.add_argument('--gen2_hidden', default=False)
-    parser.add_argument('--gen2_hidden_anno', default='/home/ct/data/sjl/gligen_official_inpaint/generated_images/text_box_180000/gen1_1%_filter_full_scar_range1_rand_fg_hidden/annotation/anno_refine.json')
+    parser.add_argument('--gen2_hidden_anno', default='output/annotations/anno_refine.json')
     parser.add_argument('--gen3_hidden', default=False)
     #parser.add_argument('--gen3_hidden_anno', default='/home/ct/data/sjl/gligen_official_inpaint/generated_images/text_box_180000/gen3_0.1%_filter_full_scar_best_hidden_newer/annotation/anno_refine.json') #pidray
-    parser.add_argument('--gen3_hidden_anno', default='/home/ct/data/sjl/gligen_official_inpaint_opiray/generated_images/text_box_100000/gen3_0.4%_filter_best/annotation/anno_refine.json') #opixray
+    parser.add_argument('--gen3_hidden_anno', default='output/annotations/anno_refine.json')
     #parser.add_argument('--gen3_hidden_anno', default='/home/ct/data/sjl/gligen_official_hixray_inpaint/generated_images/text_box_180000/gen3_0.5%_filter_best/annotation/anno_refine.json')
     
     # CAR
