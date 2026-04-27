@@ -1278,7 +1278,7 @@ def run(config):
               vis_categories = categories if args.gen_method != 3 else [category]
               for ca_map, cat in zip(cross_attention_maps, vis_categories):
                   ca_save = os.path.join(args.ca_vis_path, filename.split('.')[0] + '_' + cat + '.png')
-                  save_visualization([sample, Image.fromarray(ca_map)], ca_save, None)
+                  Image.fromarray(ca_map).save(ca_save)
 
           print(f'I am here')
 
