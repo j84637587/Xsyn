@@ -1029,7 +1029,8 @@ def run(config):
           shape = (config.batch_size, model.in_channels, model.image_size, model.image_size)
           #shape = (config.batch_size, model.in_channels, image_size // 8, image_size // 8)
 
-          controller = AttentionStore(save_global_store=True)
+          controller = AttentionStore()
+          register_attention_control(model, controller)
 
           #token_indices, input_boxes = get_indices_boxes_to_alter(tokenizer, caption, vis_boxes)
           #args.token_indices = token_indices
