@@ -86,5 +86,6 @@ lib/pycocotools/_mask.c
 lib/nms/cpu_nms.c
 
 DATA/
+data/
 output/
 checkpoints/
