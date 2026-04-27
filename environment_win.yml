@@ -1,0 +1,44 @@
+name: xsyn
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - torch==2.4.1 --index-url https://download.pytorch.org/whl/cu121
+      - torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+      - diffusers==0.29.2
+      - transformers==4.46.3
+      - omegaconf==2.1.1
+      - numpy==1.24.4
+      - Pillow==9.5.0
+      - opencv-python==4.10.0.84
+      - scipy==1.10.1
+      - scikit-image==0.21.0
+      - accelerate==0.31.0
+      - huggingface-hub==0.23.4
+      - einops==0.8.0
+      - peft==0.13.2
+      - clip-anytorch
+      - segment-anything
+      - pycocotools
+      - safetensors==0.4.3
+      - tokenizers==0.20.3
+      - tqdm==4.66.4
+      - matplotlib==3.7.5
+      - pandas==2.0.3
+      - scikit-learn==1.3.2
+      - timm==0.6.7
+      - pytorch-lightning==1.4.2
+      - torchmetrics==0.5.0
+      - wandb==0.16.6
+      - gradio==3.50.0
+      - torchviz
+      - kornia==0.6.0
+      - albumentations==1.4.15
+      - bezier
+      - natsort
+      - git+https://github.com/CompVis/taming-transformers.git

@@ -18,14 +18,37 @@ quality X-ray security image synthesis without incurring
 - Enviroment: We provide [enviroment.yml](environment.yml) to setup enviroment.
 - Data: [PIDray](https://github.com/lutao2021/PIDray), [OPIXray](https://github.com/DIG-Beihang/OPIXray) and [HiXray](https://github.com/HiXray-author/HiXray/blob/main/README.md). 
 
+
+
+```
+python prepare_pidray.py --ann_file DATA/pidray/annotations/train.json --output   DATA/pidray/pidray_train.pt          
+python prepare_pidray.py --ann_file DATA/pidray/annotations/test.json --output   DATA/pidray/pidray_test.pt  
+python prepare_pidray.py --ann_file DATA/pidray/annotations/test_easy.json --output   DATA/pidray/pidray_test_easy.pt
+python prepare_pidray.py --ann_file DATA/pidray/annotations/test_hard.json --output   DATA/pidray/pidray_test_hard.pt
+python prepare_pidray.py --ann_file DATA/pidray/annotations/test_hidden.json --output   DATA/pidray/pidray_test_hidden.pt
+```
+
+```
+conda create -n xsyn python=3.10 -c conda-forge -y
+conda activate xsyn
+pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+pip install setuptools diffusers==0.29.2 transformers==4.46.3 omegaconf==2.1.1 numpy==1.24.4 Pillow==9.5.0 opencv-python==4.10.0.84 scipy==1.10.1 scikit-image==0.21.0 accelerate==0.31.0 huggingface-hub==0.23.4 einops==0.8.0 peft==0.13.2 clip-anytorch segment-anything pycocotools safetensors tokenizers tqdm matplotlib pandas scikit-learn timm pytorch-lightning torchmetrics gradio 
+pip install torchviz kornia==0.6.0 albumentations==1.4.15 bezier natsort
+pip install git+https://github.com/openai/CLIP.git
+```
+
 ## Download Xsyn models
 
 We will provide checkpoints for different datasets. All models here are based on GLIGEN.
-| Dataset       | Mode       | Download                                                                                                       |
-|------------|----------------|----------------------------------------------------------------------------------------------------------------|
-| PIDray | text-grounded inpainting       | [HF Hub](https://huggingface.co/Pillow-1/Xsyn)       |
+| Dataset | Mode                     | Download                                       |
+| ------- | ------------------------ | ---------------------------------------------- |
+| PIDray  | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
 | OPIXray | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
-| HiXray | text-grounded inpainting       | [HF Hub](https://huggingface.co/Pillow-1/Xsyn)       |
+| HiXray  | text-grounded inpainting | [HF Hub](https://huggingface.co/Pillow-1/Xsyn) |
+
+```
+huggingface-cli download Pillow-1/Xsyn pidray_xsyn.pth --local-dir Xray/checkpoints
+```
 
 ## Training
 Please follow the instruction of text-grounded inpainting training in [GLIGEN](https://github.com/gligen/GLIGEN).
@@ -34,6 +57,10 @@ Please follow the instruction of text-grounded inpainting training in [GLIGEN](h
 We provide one script to generate x-ray security images and construct their annotations. First download models and put them in `--ckpt_path`. Then run
 ```bash
 python gligen_inference.py
+
+python gligen_inference.py --ckpt_path checkpoints/pidray_xsyn.pth  --gligen_caption_pt data/pidray/pidray_train.pt --image_path data/pidray/train --output_path output/images/ --annotation_path output/annotations/ --use_sam False --refine_anno False --gen_method 1 --batch_size 1
+
+python gligen_inference.py --ckpt_path checkpoints/pidray_xsyn.pth --gligen_caption_pt data/pidray/pidray_train.pt --image_path data/pidray/train --output_path output/images/ --annotation_path output/annotations/ --sam_weight checkpoints/sam_vit_h_4b8939.pth --use_sam True --refine_anno True --gen_method 1 --batch_size 1
 ```
 
 Details of some important args:

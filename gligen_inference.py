@@ -97,7 +97,7 @@ def alpha_generator(length, type=None):
 
 
 def load_ckpt(ckpt_path, device):
-    
+
     saved_ckpt = torch.load(ckpt_path, map_location='cpu')
     config = saved_ckpt["config_dict"]["_content"]
 
@@ -178,7 +178,7 @@ def prepare_batch(meta, device, batch=1, max_objs=30):
     phrases = [None]*len(images) if phrases==None else phrases 
     images = [None]*len(phrases) if images==None else images 
 
-    version = "/home/ct/data/sjl/openaiclip_vit_large_patch14"
+    version = "openai/clip-vit-large-patch14"
     model = CLIPModel.from_pretrained(version).to(device)
     processor = CLIPProcessor.from_pretrained(version)
     image_project = CLIPImageProjection().to(device)
@@ -350,7 +350,7 @@ def run(config):
     model, autoencoder, text_encoder, diffusion, config = load_ckpt(args.ckpt_path, device)
     model.device = device
 
-    tokenizer = CLIPTokenizer.from_pretrained('/home/ct/data/sjl/openaiclip_vit_large_patch14')
+    tokenizer = CLIPTokenizer.from_pretrained(getattr(args, 'tokenizer_path', 'openai/clip-vit-large-patch14'))
     
     if args.use_sam:
         sam = sam_model_registry[args.sam_model_type](checkpoint=args.sam_weight)
@@ -369,8 +369,11 @@ def run(config):
         grounding_downsampler_input = instantiate_from_config(config['grounding_downsampler_input'])
 
 
-    # - - - - - update config from args - - - - - # 
-    config.update( vars(args) )
+    # - - - - - update config from args - - - - - #
+    from omegaconf import OmegaConf as _OC, DictConfig
+    if isinstance(config, DictConfig):
+        config = _OC.to_container(config, resolve=True)
+    config.update(vars(args))
     config = OmegaConf.create(config)
 
 
@@ -443,13 +446,17 @@ def run(config):
     else:
         dataset = Caption_coco(args)
     print(f'len(dataset) = {len(dataset)}')
-    sampler = torch.utils.data.distributed.DistributedSampler(dataset)
-    data_loader = DataLoader(dataset, batch_size=64, sampler=sampler, num_workers=8, collate_fn = dataset.collate_fn, drop_last = False)
+    if getattr(args, 'distributed', False):
+        sampler = torch.utils.data.distributed.DistributedSampler(dataset)
+    else:
+        sampler = torch.utils.data.SequentialSampler(dataset)
+    num_workers = 0 if os.name == 'nt' else 8
+    data_loader = DataLoader(dataset, batch_size=64, sampler=sampler, num_workers=num_workers, collate_fn = dataset.collate_fn, drop_last = False)
     print(f'len(data_loader)={len(data_loader)}')
     
     specific_category_filenames = {}
-    fti_filenames = os.listdir(args.ref_path)
-    
+    fti_filenames = os.listdir(args.ref_path) if args.ref_path else []
+
     for category in categories:
       specific_category_fti(category, fti_filenames, specific_category_filenames)
     
@@ -1034,6 +1041,9 @@ def run(config):
           
           hidden_info = None
           
+          if do_hidden and not args.use_sam:
+              do_hidden = False  # BOM requires SAM; skip if SAM disabled
+
           if do_hidden:
               hidden_info = {}
               hidden_info['hidden_bg_box'] = None
@@ -1090,8 +1100,10 @@ def run(config):
           else:
             samples_fake = sampler.sample(S=steps, shape=shape, input=input,  uc=uc, guidance_scale=config.guidance_scale, mask=inpainting_mask, x0=z0, controller=controller, args=args, boxes=batch['boxes'], do_hidden=do_hidden, hidden_info=hidden_info, inpaint=args.inpaint)
           
-          cross_attention_maps = show_cross_attention(controller, from_where=('up', 'down'), select=0, prompts=[caption], tokenizer=tokenizer)
-          
+          cross_attention_maps = None
+          if args.refine_anno:
+              cross_attention_maps = show_cross_attention(controller, from_where=('up', 'down'), select=0, prompts=[caption], tokenizer=tokenizer)
+
           #print('ca_yes')
           
           if args.do_decode:
@@ -1603,7 +1615,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size",  default=1, help="")
     parser.add_argument("--guidance_scale", type=float,  default=7.5, help="")
     parser.add_argument("--negative_prompt", type=str,  default='longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality', help="")
-    parser.add_argument('--sam_weight', default = '/home/ct/sjl/research/diffusers/examples/controlnet/sam-pipeline/sam_vit_h_4b8939.pth')
+    parser.add_argument('--sam_weight', default = 'sam_vit_h_4b8939.pth')
+    parser.add_argument('--ref_path', default = '', help='directory of reference foreground images (Xsyn-A only)')
     parser.add_argument('--sam_model_type', default = 'vit_h')
     parser.add_argument('--sam_box_iou_thre', default = 0.2)
     parser.add_argument('--use_sam', default = True)
@@ -1648,5 +1661,31 @@ if __name__ == "__main__":
     parser.add_argument('--inpaint', default=True, help='')
 
     args = parser.parse_args()
-    
+
+    # Fix bool args: argparse stores string "False" which is truthy
+    _bool_args = [
+        'use_sam', 'latent_redist', 'rand_fg_mask_hidden', 'gen2_hidden', 'gen3_hidden',
+        'refine_anno', 'scratch_generate', 'do_decode', 'boxdiff',
+        'smooth_attentions', 'normalize_eot', 'inpaint',
+    ]
+    for _a in _bool_args:
+        v = getattr(args, _a, None)
+        if isinstance(v, str):
+            setattr(args, _a, v.lower() not in ('false', '0', 'no'))
+
+    # Fix int args: argparse stores them as strings when no type= is specified
+    _int_args = ['gen_method', 'batch_size', 'hidden_start_step',
+                 'occlusion_method', 'attention_res', 'kernel_size']
+    for _a in _int_args:
+        v = getattr(args, _a, None)
+        if isinstance(v, str):
+            setattr(args, _a, int(v))
+
+    # Fix float args
+    _float_args = ['guidance_scale', 'sigma', 'sam_box_iou_thre']
+    for _a in _float_args:
+        v = getattr(args, _a, None)
+        if isinstance(v, str):
+            setattr(args, _a, float(v))
+
     run(args)
